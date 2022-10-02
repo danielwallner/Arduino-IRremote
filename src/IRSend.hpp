@@ -138,6 +138,7 @@ void IRsend::begin(uint_fast8_t aSendPin, bool aEnableLEDFeedback, uint_fast8_t 
  * Interprets and sends a IRData structure.
  * @param aIRSendData The values of protocol, address, command and repeat flag are taken for sending.
  * @param aNumberOfRepeats Number of repeats to send after the initial data if data is no repeat.
+ * @return 1 if data sent, 0 if no data sent (i.e. for BANG_OLUFSEN)
  */
 size_t IRsend::write(IRData *aIRSendData, int_fast8_t aNumberOfRepeats) {
 
@@ -146,7 +147,7 @@ size_t IRsend::write(IRData *aIRSendData, int_fast8_t aNumberOfRepeats) {
     auto tCommand = aIRSendData->command;
     bool tIsRepeat = (aIRSendData->flags & IRDATA_FLAGS_IS_REPEAT);
     if (tIsRepeat) {
-        aNumberOfRepeats = -1;
+        aNumberOfRepeats = -1; // if aNumberOfRepeats < 0 then only a special repeat frame will be sent
     }
 //    switch (tProtocol) { // 26 bytes bigger than if, else if, else
 //    case NEC:
@@ -238,9 +239,6 @@ size_t IRsend::write(IRData *aIRSendData, int_fast8_t aNumberOfRepeats) {
         sendApple(tAddress, tCommand, aNumberOfRepeats);
 
 #if !defined(EXCLUDE_EXOTIC_PROTOCOLS)
-    } else if (tProtocol == BANG_OLUFSEN) {
-        sendBangOlufsen(tAddress, tCommand, 9, false, aNumberOfRepeats);
-
     } else if (tProtocol == BOSEWAVE) {
         sendBoseWave(tCommand, aNumberOfRepeats);
 
@@ -252,6 +250,8 @@ size_t IRsend::write(IRData *aIRSendData, int_fast8_t aNumberOfRepeats) {
         sendLegoPowerFunctions(tAddress, tCommand, tCommand >> 4, tIsRepeat); // send 5 autorepeats
 #endif
 
+    } else {
+        return 0; // Not supported by write. E.g for BANG_OLUFSEN
     }
     return 1;
 }
