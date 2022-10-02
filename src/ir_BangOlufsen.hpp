@@ -178,7 +178,7 @@ void IRsend::sendBangOlufsenRaw(uint32_t aRawData, int_fast8_t aBits, bool aBack
 // So this first 0 is treated as the last bit of AGC
     mark(BEO_IR_MARK);
     space(BEO_PULSE_LENGTH_ZERO - BEO_IR_MARK);
-    bool tLastBit = true;
+    bool tLastBit = false;
 
 // Header / Data
     uint32_t mask = 1UL << (aBits - 1);
@@ -238,7 +238,7 @@ void IRsend::sendBangOlufsenRawDataLink(uint64_t aRawData, int_fast8_t aBits, bo
 // So this first 0 is treated as the last bit of AGC
     mark(tSendBEOMarkLength);
     space(BEO_PULSE_LENGTH_ZERO - tSendBEOMarkLength);
-    bool tLastBit = true;
+    bool tLastBit = false;
 
 // Header / Data
     uint32_t mask = 1UL << (aBits - 1);
@@ -292,7 +292,7 @@ bool IRrecv::decodeBangOlufsen() {
 #else
     uint32_t tDecodedRawData = 0;
 #endif
-    uint8_t tLastDecodedBitValue = 1;
+    uint8_t tLastDecodedBitValue = 0;
     uint8_t tPulseNumber = 0;
     uint8_t tBitNumber = 0;
 
